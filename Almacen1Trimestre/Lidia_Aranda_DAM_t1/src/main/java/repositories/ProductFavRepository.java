@@ -10,9 +10,7 @@ public class ProductFavRepository {
     private ResultSet resultSet;
 
     public boolean isProductExists(int id) {
-        String query = "SELECT COUNT(*) FROM productfav WHERE idProduct > ?";
-
-
+        String query = "SELECT COUNT(*) FROM productfav WHERE idProduct = ?";
         Connection connection = DBConnection.getConnection();
         try {
             preparedStatement = connection.prepareStatement(query);
@@ -22,10 +20,18 @@ public class ProductFavRepository {
                 return resultSet.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            System.out.println("Error en SQL" + e.getMessage());
+            System.out.println("Error en SQL: " + e.getMessage());
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Error al cerrar recursos: " + e.getMessage());
+            }
         }
         return false;
     }
+
 
     public void insterFav(float price) {
         String querySelect = "SELECT id FROM product WHERE price > ?";
