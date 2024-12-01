@@ -41,7 +41,7 @@ public class Entrada {
             switch (option) {
                 case 1:
                     employeeRepository.addEmployee(new Employee("12345678B", "Marta", "Garrido Gutierrez", "marta@gmail.com"));
-                    employeeRepository.addEmployee(new Employee("45789128N", "Juan", "Garcia Ramirez", "juan#gmail.com"));
+                    employeeRepository.addEmployee(new Employee("45789128N", "Juan", "Garcia Ramirez", "juan@gmail.com"));
                     employeeRepository.addEmployee(new Employee("98732123P", "Francisco", "Sánchez López", "francisco@gmail.com"));
                     employeeRepository.addEmployee(new Employee("98721321B", "Sara", "Visiedo Gómez", "Sara@gmail.com"));
                     System.out.println("_______________________________________________________________________________________________");
@@ -65,6 +65,7 @@ public class Entrada {
                     orderRepository.addOrder(14);
                     orderRepository.addOrder(20);
                     orderRepository.addOrder(29);
+                    orderRepository.addOrder(5);
                     break;
                 case 7:
                     orderRepository.showOrder();

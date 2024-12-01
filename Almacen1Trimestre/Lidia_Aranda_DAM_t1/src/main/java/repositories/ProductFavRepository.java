@@ -10,7 +10,7 @@ public class ProductFavRepository {
     private ResultSet resultSet;
 
     public boolean isProductExists(int id) {
-        String query = "SELECT COUNT(*) FROM productfav WHERE idProduct = ?";
+        String query = "SELECT COUNT(*) FROM productfav WHERE idProduct > ?";
 
 
         Connection connection = DBConnection.getConnection();
@@ -28,38 +28,55 @@ public class ProductFavRepository {
     }
 
     public void insterFav(float price) {
-        String query = "SELECT id FROM product WHERE price > ?";
+        String querySelect = "SELECT id FROM product WHERE price > ?";
+        String queryInsert = "INSERT INTO productfav (idProduct) VALUES (?)";
 
         Connection connection = DBConnection.getConnection();
+        PreparedStatement selectStatement = null;
+        PreparedStatement insertStatement = null;
+        ResultSet resultSet = null;
+
         try {
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setFloat(1, price);
-            resultSet = preparedStatement.executeQuery();
+
+            selectStatement = connection.prepareStatement(querySelect);
+            selectStatement.setFloat(1, price);
+            resultSet = selectStatement.executeQuery();
             boolean found = false;
+
 
             while (resultSet.next()) {
                 found = true;
                 int idProduct = resultSet.getInt("id");
                 System.out.println("Producto encontrado con id: " + idProduct);
+
                 if (!isProductExists(idProduct)) {
-                    String queryInsert = "INSERT INTO productfav (idProduct) VALUES (?)";
-                    preparedStatement = connection.prepareStatement(queryInsert);
-                    preparedStatement.setInt(1, idProduct);
-                    preparedStatement.execute();
-                    System.out.println("Producto encontrado con id: " + idProduct);
+                    insertStatement = connection.prepareStatement(queryInsert);
+                    insertStatement.setInt(1, idProduct);
+                    insertStatement.execute();
+                    System.out.println("Producto agregado a favoritos con id: " + idProduct);
                 } else {
                     System.out.println("El producto con id: " + idProduct + " ya está en favoritos.");
                 }
             }
+
             if (!found) {
-                System.out.println("No hay productos con precio mayor de 1000€. ");
+                System.out.println("No hay productos con precio mayor de " + price + "€.");
             }
         } catch (SQLException e) {
-            System.out.println("Error en SQL insertar Favoritos" + e.getMessage());
+            System.out.println("Error en SQL insertar Favoritos: " + e.getMessage());
         } finally {
-            DBConnection.closeConnection();
+            // Cerrar recursos
+            try {
+                if (resultSet != null) resultSet.close();
+                if (selectStatement != null) selectStatement.close();
+                if (insertStatement != null) insertStatement.close();
+                DBConnection.closeConnection();
+            } catch (SQLException e) {
+                System.out.println("Error al cerrar recursos: " + e.getMessage());
+            }
         }
     }
+
 
     public void showProduct() {
 
@@ -76,12 +93,12 @@ public class ProductFavRepository {
             ResultSet result = statement.executeQuery(query);
 
             while (result.next()) {
-                int favId = result.getInt("idFav"); // id de favoritos
-                int productId = result.getInt("productId"); // id del producto
-                String title = result.getString("title"); // título del producto
-                String description = result.getString("description"); // descripción del producto
-                int stock = result.getInt("stock"); // cantidad en stock
-                float price = result.getFloat("price"); // precio del producto
+                int favId = result.getInt("idFav");
+                int productId = result.getInt("productId");
+                String title = result.getString("title");
+                String description = result.getString("description");
+                int stock = result.getInt("stock");
+                float price = result.getFloat("price");
 
 
                 System.out.printf("\n\nID Favorito: %d" +
