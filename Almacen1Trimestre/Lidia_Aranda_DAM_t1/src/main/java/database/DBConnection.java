@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DBConnection {
 
     public static Connection connection;
-
+//Singlenton
     public static Connection getConnection() {
         if (connection == null) {
             createConnection();

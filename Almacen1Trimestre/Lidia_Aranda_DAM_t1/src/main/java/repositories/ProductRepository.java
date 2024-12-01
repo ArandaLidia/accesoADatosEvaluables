@@ -25,14 +25,13 @@ public class ProductRepository {
     ResultSet resultSet;
 
     public void addProductJson(String url) {
-
         try {
             URL url1 = new URL(url);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url1.openConnection();
             bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String read = bufferedReader.readLine();
-            JSONObject aswer = new JSONObject(read);
-            JSONArray products = aswer.getJSONArray("products");
+            JSONObject answer = new JSONObject(read);
+            JSONArray products = answer.getJSONArray("products");
 
             for (int i = 0; i < products.length(); i++) {
                 JSONObject product = products.getJSONObject(i);
@@ -41,25 +40,30 @@ public class ProductRepository {
                 String description = product.getString("description");
                 int stock = product.getInt("stock");
                 float price = product.getFloat("price");
-                newProduct = new Product(id, title, description, stock, price);
-                createProduct(id, title, description, stock, price);
-                System.out.println("Productos insertados correctamente.");
+
+                if (!isProductExist(id)) {
+                    createProduct(id, title, description, stock, price);
+                    System.out.println("Producto insertado correctamente: " + title);
+                } else {
+                    System.out.println("ERROR: El producto con ID " + id + " ya existe.");
+                }
             }
 
         } catch (MalformedURLException e) {
-            System.out.println("Error en URL" + e.getMessage());
+            System.out.println("Error en URL: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("Error de conexión" + e.getMessage());
+            System.out.println("Error de conexión: " + e.getMessage());
         } finally {
             try {
-                bufferedReader.close();
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
             } catch (IOException e) {
                 System.out.println("Error al cerrar el buffer: " + e.getMessage());
             }
         }
-
-
     }
+
 
     public void createProduct(int id, String title, String description, int stock, float price) {
         String query = "INSERT INTO product (id, title, description, stock, price) VALUES (?, ?, ?, ?, ?)";
